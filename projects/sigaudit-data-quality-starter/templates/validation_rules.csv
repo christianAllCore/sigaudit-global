@@ -1,0 +1,7 @@
+field,required,unique_key,allowed_values
+asset_id,yes,yes,
+asset_type,yes,no,TRANSFORMER|SWITCH|CUSTOMER|FEEDER|METER
+feeder_code,yes,no,
+status,yes,no,ACTIVE|RETIRED|PLANNED
+province_code,yes,no,01|02|03|04|05
+install_year,no,no,
