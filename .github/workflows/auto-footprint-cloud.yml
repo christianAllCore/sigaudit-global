@@ -1,4 +1,5 @@
 name: Auto Footprint Cloud
+# Manual trigger from ChatGPT: 2026-05-25
 
 on:
   push:
