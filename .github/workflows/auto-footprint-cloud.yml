@@ -1,13 +1,23 @@
 name: Auto Footprint Cloud
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - "automation/auto_footprint_cloud.py"
+      - ".github/workflows/auto-footprint-cloud.yml"
   schedule:
     # 10:30 Ecuador time = 15:30 UTC
     - cron: "30 15 * * *"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   publish-footprint:
@@ -15,8 +25,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -30,14 +38,20 @@ jobs:
           FOOTPRINT_BLOCKED_TERMS: ${{ secrets.FOOTPRINT_BLOCKED_TERMS }}
         run: python automation/auto_footprint_cloud.py
 
-      - name: Commit and publish changes
+      - name: Show generated files
         run: |
-          git config user.name "auto-footprint-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md docs posts social products portfolio automation/state || true
-          if git diff --cached --quiet; then
-            echo "No changes to publish."
-          else
-            git commit -m "auto-footprint: publish daily public-safe content"
-            git push
-          fi
+          echo "Generated files for manual review:"
+          find docs posts social products portfolio automation/state -type f -maxdepth 3 2>/dev/null | sort || true
+
+      - name: Upload generated draft for manual review
+        uses: actions/upload-artifact@v4
+        with:
+          name: footprint-draft
+          path: |
+            docs/
+            posts/
+            social/
+            products/
+            portfolio/
+            automation/state/
+          if-no-files-found: error
